@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MinhaCasa GO | Benefícios Habitacionais em Goiás</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --roxo: #6b2c90;
+      --roxo-claro: #9b5ac6;
+      --roxo-escuro: #482065;
+      --dourado: #d6a654;
+      --fundo-card: #ffffff;
+      --texto: #2d2135;
+      --muted: #7f708f;
+      --borda: #e5d8f0;
+      --erro-suave: #fff5e7;
+      --verde: #25D366;
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, #fdf8ff 0, #f5f0fa 40%, #f3edf9 100%);
+      color: var(--texto);
+      line-height: 1.6;
+    }
+
+    /* ── PAGE SWITCHING via CSS :target ─────────────── */
+    /* page1 visible by default; page2 hidden by default */
+    #page1 { display: block; }
+    #page2 { display: none;  }
+
+    /* When #page2 is targeted in the URL hash → show it, hide page1 */
+    #page2:target              { display: block; }
+    body:has(#page2:target) #page1 { display: none;  }
+
+    /* ── TOP STRIP ───────────────────────────────────── */
+    .top-strip-wrap {
+      width: 100%;
+      overflow: hidden;
+      background: linear-gradient(90deg, #f5ecff, #fff5e7);
+      border-bottom: 1px solid #ecdff8;
+    }
+    .top-strip {
+      display: flex;
+      gap: 40px;
+      white-space: nowrap;
+      padding: 6px 0;
+      animation: slide-left 28s linear infinite;
+      font-size: 0.78rem;
+      color: var(--roxo-escuro);
+      font-weight: 500;
+    }
+    .top-strip span { display: inline-flex; align-items: center; gap: 6px; }
+    .top-strip span::before { content: "•"; color: var(--dourado); font-size: 1rem; }
+    @keyframes slide-left {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── HEADER ──────────────────────────────────────── */
+    header {
+      padding: 14px 20px;
+      background: transparent;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--roxo-escuro), var(--roxo));
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg { width: 24px; height: 24px; fill: #fff; }
+    .logo-name { font-size: 1.12rem; font-weight: 800; color: var(--texto); line-height: 1.1; }
+    .logo-name em { font-style: normal; color: var(--roxo); }
+    .logo-name span.go-badge {
+      display: inline-block;
+      background: var(--dourado); color: #fff;
+      font-size: 0.65rem; font-weight: 800;
+      padding: 1px 5px; border-radius: 4px;
+      margin-left: 3px; vertical-align: middle; letter-spacing: 0.04em;
+    }
+    .logo-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+    .header-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 18px; border-radius: 999px;
+      border: 1px solid rgba(107,44,144,0.16);
+      color: var(--roxo-escuro); font-size: 0.8rem; font-weight: 600;
+      text-decoration: none; background: rgba(255,255,255,0.9);
+      box-shadow: 0 8px 22px rgba(72,32,101,0.08);
+    }
+    .header-cta:hover { background: #f5ecff; }
+
+    @media (max-width: 580px) { .logo-sub { display: none; } }
+
+    /* ── CONTAINER ───────────────────────────────────── */
+    .container { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── HERO ────────────────────────────────────────── */
+    .hero { padding: 30px 0 38px; }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0,1.35fr) minmax(0,1fr);
+      gap: 32px; align-items: center;
+    }
+    @media (max-width: 840px) { .hero-grid { grid-template-columns: 1fr; gap: 22px; } }
+
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f5ecff; border-radius: 999px; padding: 4px 12px;
+      font-size: 0.76rem; font-weight: 600; color: var(--roxo-escuro);
+    }
+    .badge svg { width: 14px; height: 14px; fill: var(--roxo-escuro); }
+
+    h1 { font-size: clamp(2.0rem, 3.1vw, 2.6rem); font-weight: 800; line-height: 1.16; margin-bottom: 12px; }
+    h1 span.roxo { color: var(--roxo); }
+    h1 span.dourado { color: var(--dourado); }
+
+    .hero-sub { font-size: 0.98rem; color: var(--muted); max-width: 520px; margin-bottom: 20px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .chip {
+      font-size: 0.75rem; padding: 4px 10px; border-radius: 999px;
+      border: 1px solid rgba(45,33,53,0.06); background: rgba(255,255,255,0.9);
+      color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+    }
+    .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dourado); }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--roxo); color: #fff;
+      font-size: 0.98rem; font-weight: 700;
+      padding: 13px 24px; border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 14px 32px rgba(72,32,101,0.32);
+    }
+    .btn-primary span.arrow { font-size: 1.1rem; }
+    .btn-primary:hover { background: var(--roxo-claro); }
+
+    /* ── HERO SIDE CARD ──────────────────────────────── */
+    .hero-side-card {
+      position: relative;
+      background: radial-gradient(circle at top left, #fdf8ff, #ffffff 42%, #f7f0ff 100%);
+      border-radius: 20px; border: 1px solid var(--borda);
+      box-shadow: 0 20px 40px rgba(60,40,80,0.12);
+      padding: 20px 18px 18px; overflow: hidden;
+    }
+    .hero-side-card::before {
+      content: ""; position: absolute; right: -60px; top: -60px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(214,166,84,0.45), transparent 65%);
+      opacity: 0.7; pointer-events: none;
+    }
+    .hero-side-title { font-size: 0.94rem; font-weight: 700; color: var(--roxo-escuro); margin-bottom: 10px; }
+    .hero-side-list {
+      list-style: none; margin: 6px 0 10px;
+      display: flex; flex-direction: column; gap: 8px;
+      font-size: 0.87rem; color: var(--muted);
+    }
+    .hero-side-list li { display: flex; gap: 8px; align-items: flex-start; }
+    .hero-side-list span.ico {
+      font-size: 0.9rem; flex-shrink: 0; margin-top: 1px;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--roxo-escuro); color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.76rem;
+    }
+    .hero-side-highlight {
+      margin-top: 12px; padding: 10px 12px; border-radius: 12px;
+      background: rgba(214,166,84,0.1); font-size: 0.82rem;
+      color: #6b542e; border-left: 3px solid var(--dourado);
+    }
+    .hero-side-highlight strong { color: #4c361a; }
+
+    /* ── NOME SUJO ALERT ─────────────────────────────── */
+    .nome-sujo-box {
+      margin-top: 14px; background: #fff9ec;
+      border: 1px solid #f0d080; border-radius: 14px;
+      padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px;
+    }
+    .nome-sujo-ico {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: #f5c842; display: flex; align-items: center;
+      justify-content: center; font-size: 1rem; flex-shrink: 0;
+    }
+    .nome-sujo-body h4 { font-size: 0.9rem; font-weight: 700; color: #5a3e0a; margin-bottom: 4px; }
+    .nome-sujo-body p { font-size: 0.84rem; color: #7a5a2c; margin-bottom: 10px; }
+    .btn-wpp-small {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--verde); color: #fff;
+      font-size: 0.82rem; font-weight: 700;
+      padding: 7px 14px; border-radius: 999px; text-decoration: none;
+    }
+    .btn-wpp-small svg { width: 14px; height: 14px; fill: #fff; }
+
+    /* ── SECTIONS ────────────────────────────────────── */
+    section.block { padding: 26px 0 10px; }
+    .section-label {
+      font-size: 0.76rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--roxo-escuro); margin-bottom: 6px;
+    }
+    h2 { font-size: clamp(1.5rem, 2.2vw, 1.9rem); font-weight: 800; margin-bottom: 6px; }
+    .section-intro { font-size: 0.95rem; color: var(--muted); max-width: 580px; }
+
+    /* ── CARDS ───────────────────────────────────────── */
+    .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 18px; }
+    .card {
+      background: var(--fundo-card); border-radius: 14px;
+      border: 1px solid var(--borda); padding: 18px 16px 16px;
+      box-shadow: 0 12px 26px rgba(60,40,80,0.06);
+    }
+    .card-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; padding: 3px 9px; border-radius: 999px;
+      background: #f5ecff; color: var(--roxo-escuro);
+      margin-bottom: 8px; font-weight: 600;
+    }
+    .card h3 { font-size: 0.96rem; font-weight: 700; margin-bottom: 4px; color: var(--texto); }
+    .card p { font-size: 0.86rem; color: var(--muted); }
+
+    /* ── CHECKLIST ───────────────────────────────────── */
+    .checklist { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 10px; max-width: 620px; }
+    .check-item { display: flex; gap: 10px; font-size: 0.9rem; color: var(--texto); }
+    .check-ico {
+      width: 22px; height: 22px; border-radius: 999px;
+      background: #efe4ff; display: inline-flex; align-items: center;
+      justify-content: center; font-size: 0.7rem;
+      color: var(--roxo); flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── ALERTA SUAVE ────────────────────────────────── */
+    .alerta-box {
+      background: var(--erro-suave); border-radius: 14px;
+      border: 1px solid #f1ddc2; padding: 14px 14px 12px;
+      margin-top: 18px; max-width: 650px; display: flex; gap: 10px;
+    }
+    .alerta-ico {
+      width: 22px; height: 22px; border-radius: 6px;
+      background: #f0cf97; display: inline-flex;
+      align-items: center; justify-content: center;
+      font-size: 0.9rem; color: #5c3e16; flex-shrink: 0; margin-top: 2px;
+    }
+    .alerta-text h3 { font-size: 0.9rem; font-weight: 700; color: #5c3e16; margin-bottom: 4px; }
+    .alerta-text p { font-size: 0.85rem; color: #7a5a2c; }
+
+    /* ── DEPOIMENTOS ─────────────────────────────────── */
+    .depo-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 16px; }
+    .depo {
+      background: #ffffff; border-radius: 14px;
+      border: 1px solid var(--borda); padding: 16px 14px 14px;
+      font-size: 0.86rem; color: var(--muted);
+      box-shadow: 0 10px 24px rgba(60,40,80,0.07); position: relative;
+    }
+    .depo::before {
+      content: '"'; position: absolute; top: 10px; left: 14px;
+      font-size: 2.8rem; line-height: 1; color: var(--borda);
+      font-family: Georgia, serif;
+    }
+    .depo-text { padding-top: 18px; }
+    .depo strong { color: var(--texto); }
+    .depo span.valor { display: block; margin-top: 6px; font-size: 0.78rem; color: var(--roxo-escuro); font-weight: 600; }
+
+    /* ── PASSOS ──────────────────────────────────────── */
+    .steps { margin-top: 18px; display: flex; flex-direction: column; gap: 0; max-width: 640px; }
+    .step { display: flex; gap: 14px; font-size: 0.88rem; color: var(--texto); position: relative; padding-bottom: 18px; }
+    .step:last-child { padding-bottom: 0; }
+    .step-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .step-num {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--roxo); color: #fff;
+      font-size: 0.88rem; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 16px rgba(72,32,101,0.25);
+    }
+    .step-line { width: 2px; flex: 1; background: var(--borda); margin-top: 4px; }
+    .step:last-child .step-line { display: none; }
+    .step-body { padding-top: 6px; }
+    .step-title { font-weight: 700; font-size: 0.94rem; margin-bottom: 4px; color: var(--texto); }
+    .step-desc { color: var(--muted); font-size: 0.86rem; }
+
+    /* ── CTA FINAL ───────────────────────────────────── */
+    .cta-final { padding: 28px 0 32px; }
+    .cta-box {
+      background: linear-gradient(135deg, #ffffff, #f5ecff);
+      border-radius: 22px; border: 1px solid var(--borda);
+      padding: 28px 24px 24px; text-align: center;
+      box-shadow: 0 18px 40px rgba(60,40,80,0.12);
+    }
+    .cta-box h2 { margin-bottom: 6px; }
+    .cta-box .cta-sub { font-size: 1.1rem; font-weight: 600; color: var(--roxo-escuro); margin-bottom: 18px; }
+
+    .btn-wpp {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--verde); color: #fff;
+      font-size: 0.96rem; font-weight: 700;
+      padding: 12px 24px; border-radius: 999px;
+      text-decoration: none;
+      box-shadow: 0 12px 30px rgba(37,211,102,0.3);
+    }
+    .btn-wpp svg { width: 18px; height: 18px; fill: #fff; }
+
+    .cta-links { margin-top: 14px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .cta-link {
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--roxo); text-decoration: underline;
+    }
+    .cta-divider { font-size: 0.82rem; color: var(--borda); }
+
+    /* ── FOOTER ──────────────────────────────────────── */
+    footer {
+      text-align: center; font-size: 0.78rem; color: var(--muted);
+      padding: 16px 20px 24px; border-top: 1px solid var(--borda); margin-top: 10px;
+    }
+    footer strong { color: var(--texto); }
+    footer a { color: var(--roxo); text-decoration: none; }
+
+    /* ═══════════════════════════════════════════════════
+       PAGE 2 — FORMULÁRIO
+    ═══════════════════════════════════════════════════ */
+    .form-page { min-height: 100vh; }
+    .form-hero {
+      background: linear-gradient(135deg, var(--roxo-escuro) 0%, var(--roxo) 100%);
+      padding: 32px 20px 28px; text-align: center; color: #fff;
+    }
+    .form-hero h2 { font-size: clamp(1.4rem, 2.8vw, 2rem); font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .form-hero p { font-size: 0.92rem; opacity: 0.85; max-width: 540px; margin: 0 auto; }
+
+    .form-wrap { max-width: 720px; margin: 0 auto; padding: 30px 20px 40px; }
+
+    /* Renda type toggle — CSS-only via hidden radios */
+    .renda-toggle { display: flex; gap: 0; background: #f5ecff; border-radius: 12px; padding: 4px; margin-bottom: 28px; }
+    .renda-toggle input[type=radio] { display: none; }
+    .renda-label {
+      flex: 1; padding: 10px 12px; border-radius: 9px;
+      font-size: 0.88rem; font-weight: 600;
+      color: var(--muted); cursor: pointer; text-align: center;
+      user-select: none; -webkit-user-select: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    /* Label active states — formal active by default */
+    .label-formal { background: var(--roxo); color: #fff; box-shadow: 0 4px 12px rgba(72,32,101,0.22); border-radius: 9px; }
+    /* When informal radio is checked, swap */
+    #mainForm:has(#radioInformal:checked) .label-formal   { background: transparent; color: var(--muted); box-shadow: none; }
+    #mainForm:has(#radioInformal:checked) .label-informal { background: var(--roxo); color: #fff; box-shadow: 0 4px 12px rgba(72,32,101,0.22); border-radius: 9px; }
+    /* Show/hide doc sections based on radio */
+    #radioFormal:checked  ~ #secFormal   { display: block; }
+    #radioFormal:checked  ~ #secInformal { display: none;  }
+    #radioInformal:checked ~ #secFormal   { display: none;  }
+    #radioInformal:checked ~ #secInformal { display: block; }
+
+    .form-section { margin-bottom: 26px; }
+    .form-section-title {
+      font-size: 0.8rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--roxo-escuro); margin-bottom: 4px;
+    }
+    .form-section-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 560px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .field { display: flex; flex-direction: column; gap: 4px; }
+    .field label { font-size: 0.8rem; font-weight: 600; color: var(--texto); }
+    .field input, .field select {
+      padding: 9px 12px; border: 1px solid var(--borda);
+      border-radius: 9px; font-size: 0.88rem; font-family: inherit;
+      background: #fff; color: var(--texto);
+      -webkit-appearance: none; appearance: none;
+    }
+    .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237f708f' stroke-width='1.5' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+    .field input:focus, .field select:focus { outline: none; border-color: var(--roxo-claro); box-shadow: 0 0 0 3px rgba(107,44,144,0.1); }
+
+    /* Document upload row */
+    .doc-list { display: flex; flex-direction: column; gap: 10px; margin-top: 2px; }
+    .doc-item {
+      display: flex; align-items: center; gap: 10px;
+      background: #ffffff; border: 1px solid var(--borda);
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .doc-item.uploaded { border-color: #a8e6bf; background: #f0fff6; }
+    .doc-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: #f5ecff; display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 1rem;
+    }
+    .doc-item.uploaded .doc-icon { background: #d4f4e2; }
+    .doc-info { flex: 1; min-width: 0; }
+    .doc-name { font-size: 0.86rem; font-weight: 600; color: var(--texto); line-height: 1.3; }
+    .doc-hint { font-size: 0.75rem; color: var(--muted); }
+    .btn-upload {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 12px; border-radius: 7px;
+      border: 1px solid var(--roxo-claro); background: transparent;
+      color: var(--roxo); font-size: 0.78rem; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+    }
+    .btn-upload-wrap { position: relative; overflow: hidden; }
+    .btn-upload-wrap input[type=file] {
+      position: absolute; opacity: 0;
+      width: 100%; height: 100%; cursor: pointer; top: 0; left: 0;
+    }
+
+    .optional-tag {
+      font-size: 0.68rem; padding: 1px 6px; border-radius: 4px;
+      background: #f0f0f0; color: #999; font-weight: 600;
+    }
+
+    .form-divider { border: none; border-top: 1px solid var(--borda); margin: 24px 0; }
+
+    .submit-area { text-align: center; margin-top: 30px; }
+    .btn-submit {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--roxo); color: #fff;
+      font-size: 1rem; font-weight: 700;
+      padding: 14px 32px; border-radius: 999px;
+      border: none; cursor: pointer;
+      box-shadow: 0 14px 32px rgba(72,32,101,0.32);
+      -webkit-appearance: none;
+    }
+    .submit-note { margin-top: 10px; font-size: 0.8rem; color: var(--muted); }
+
+    /* ── SUCCESS ─────────────────────────────────────── */
+    .success-box {
+      display: none; max-width: 520px; margin: 30px auto;
+      background: #f0fff6; border: 1px solid #a8e6bf;
+      border-radius: 18px; padding: 28px 24px; text-align: center;
+    }
+    .success-box .success-ico { font-size: 2.8rem; margin-bottom: 12px; }
+    .success-box h3 { font-size: 1.3rem; font-weight: 800; color: #1a6e3c; margin-bottom: 8px; }
+    .success-box p { font-size: 0.9rem; color: #2e7d52; margin-bottom: 18px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; color: var(--muted);
+      text-decoration: none; padding: 6px 0; margin-bottom: 20px;
+    }
+    .back-link:hover { color: var(--roxo); }
+
+    @media (max-width: 520px) {
+      .btn-primary, .btn-wpp, .btn-submit { width: 100%; justify-content: center; }
+    }
+
+    /* ── ALL TAPPABLE ELEMENTS ───────────────────────── */
+    a, button, [role=button] {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║   PAGE 1 — shown by default                  ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<div id="page1">
+
+  <div class="top-strip-wrap">
+    <div class="top-strip">
+      <span>Benefícios habitacionais para Goiás</span>
+      <span>Até R$ 47.800 de Subsídio Estadual + Minha Casa Minha Vida</span>
+      <span>Simule Agora</span>
+      <span>Atendimento Personalizado</span>
+      <span>Benefícios habitacionais para Goiás</span>
+      <span>Até R$ 47.800 de Subsídio Estadual + Minha Casa Minha Vida</span>
+      <span>Simule Agora</span>
+      <span>Atendimento Personalizado</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a class="logo-wrap" href="#page1">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-name"><em>MinhaCasa</em><span class="go-badge">GO</span></div>
+          <div class="logo-sub">www.minhacasago.com.br</div>
+        </div>
+      </a>
+      <a class="header-cta" href="#page2">
+        <span>🏠</span>
+        Simule Agora
+      </a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div>
+          <div class="badge-row">
+            <div class="badge">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 9.9-4.95L12 2zm0 7.3L5.15 7 12 3.7 18.85 7 12 9.3zM2 17l10 5 9.9-4.95-.02-6.02L12 16.3 2 11v6z"/>
+              </svg>
+              Goiás · Subsídio Estadual + Minha Casa Minha Vida
+            </div>
+          </div>
+
+          <h1>
+            Sua casa com até <span class="roxo">R$ 100 mil</span><br/>
+            em Subsídio Estadual +<br/>
+            <span class="dourado">Minha Casa Minha Vida,</span><br/>
+            com orientação do início ao fim.
+          </h1>
+
+          <p class="hero-sub">
+            O Governo de Goiás oferece subsídio estadual de até R$ 47.800 que, combinado
+            ao programa Minha Casa Minha Vida, pode chegar a R$ 100 mil em benefícios
+            para a conquista da sua casa própria. A MinhaCasa GO te orienta em cada etapa.
+          </p>
+
+          <div class="chips">
+            <div class="chip"><span class="chip-dot"></span>Simule Agora</div>
+            <div class="chip"><span class="chip-dot"></span>Gratuito</div>
+            <div class="chip"><span class="chip-dot"></span>Atendimento Personalizado</div>
+          </div>
+
+          <a class="btn-primary" href="#page2">
+            <span class="arrow">→</span>
+            Simular meu benefício agora
+          </a>
+        </div>
+
+        <div>
+          <div class="hero-side-card">
+            <div class="hero-side-title">Como funciona a análise MinhaCasa GO</div>
+            <ul class="hero-side-list">
+              <li><span class="ico">1</span>Você informa seus dados e envia os documentos necessários.</li>
+              <li><span class="ico">2</span>Realizamos seu enquadramento e retornamos com o valor do seu Subsídio.</li>
+              <li><span class="ico">3</span>Você escolhe seu imóvel em visitação.</li>
+            </ul>
+            <div class="hero-side-highlight">
+              <strong>Objetivo:</strong> te dar clareza sobre qual benefício pode utilizar, com orientação especializada e sem complicação.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <p class="section-label">Entenda o benefício</p>
+      <h2>Você não está comprando só o imóvel. Está acessando um benefício.</h2>
+      <p class="section-intro">
+        Nosso trabalho é te ajudar a aproveitar, da melhor forma, os recursos
+        que o governo está disponibilizando agora para a casa própria em Goiás.
+      </p>
+      <div class="cards-row">
+        <div class="card">
+          <div class="card-pill">Programa federal</div>
+          <h3>Minha Casa Minha Vida</h3>
+          <p>Financiamento com juros reduzidos e parte do valor da casa subsidiado pelo governo federal, pensado especialmente para famílias de menor renda.</p>
+        </div>
+        <div class="card">
+          <div class="card-pill">Governo de Goiás</div>
+          <h3>Subsídio Estadual de até R$ 47.800</h3>
+          <p>Complemento que pode reduzir a entrada ou as parcelas, disponível para quem mora ou trabalha em Goiás e se enquadra nas regras do programa.</p>
+        </div>
+        <div class="card">
+          <div class="card-pill">Na prática</div>
+          <h3>Benefício Combinado</h3>
+          <p>Dependendo do seu perfil, a combinação dos programas pode representar um benefício expressivo para conquistar a casa própria com condições diferenciadas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <p class="section-label">Quem pode participar</p>
+      <h2>Veja se você se encaixa</h2>
+      <p class="section-intro">Confira os critérios principais para acesso aos benefícios habitacionais em Goiás.</p>
+
+      <ul class="checklist">
+        <li class="check-item"><span class="check-ico">✓</span><div><strong>Renda inferior a 3 salários mínimos</strong></div></li>
+        <li class="check-item"><span class="check-ico">✓</span><div><strong>Não possuir outro imóvel em seu nome</strong></div></li>
+        <li class="check-item"><span class="check-ico">✓</span><div><strong>Residir ou trabalhar há pelo menos 3 anos em Goiás</strong></div></li>
+      </ul>
+
+      <div class="nome-sujo-box" style="max-width:620px;">
+        <div class="nome-sujo-ico">⚠️</div>
+        <div class="nome-sujo-body">
+          <h4>Está com nome sujo?</h4>
+          <p>Não se preocupe. Entre em contato diretamente com nosso time pelo WhatsApp e veja quais opções estão disponíveis para o seu caso.</p>
+          <a href="https://wa.me/5561992655756?text=Ol%C3%A1%21+Tenho+d%C3%BAvidas+sobre+o+subs%C3%ADdio+habitacional+mas+estou+com+o+nome+sujo." class="btn-wpp-small" target="_blank">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Falar pelo WhatsApp
+          </a>
+        </div>
+      </div>
+
+      <div class="alerta-box">
+        <div class="alerta-ico">!</div>
+        <div class="alerta-text">
+          <h3>Sobre a disponibilidade do benefício</h3>
+          <p>Os programas utilizam recursos públicos e podem ter valores e regras ajustados ao longo do tempo. Vale verificar sua situação enquanto as condições atuais estão vigentes e ainda há verba disponível.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <p class="section-label">Passo a passo</p>
+      <h2>Do seu primeiro passo ao saque do seu Benefício</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div>
+          <div class="step-body">
+            <div class="step-title">Registra seus dados e documentos</div>
+            <div class="step-desc">Você informa seus dados e nos envia os documentos necessários para análise de crédito — tudo de forma simples pelo formulário.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div>
+          <div class="step-body">
+            <div class="step-title">Recebe seu enquadramento e valor do Benefício</div>
+            <div class="step-desc">Nossa equipe realiza a análise completa do seu perfil e retorna com o valor exato do seu Subsídio disponível.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div>
+          <div class="step-body">
+            <div class="step-title">Escolhe seu Imóvel</div>
+            <div class="step-desc">Com o benefício aprovado em mãos, você visita e escolhe o imóvel dos seus sonhos dentro das opções disponíveis.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="container">
+      <p class="section-label">Experiências reais</p>
+      <h2>Famílias que já aproveitaram o benefício</h2>
+      <div class="depo-row">
+        <div class="depo"><div class="depo-text">Achei que nunca ia conseguir minha casa própria. A equipe da MinhaCasa GO me orientou em tudo e o benefício foi muito maior do que eu esperava.<br/><br/><strong>Fernanda R. — Valparaíso de Goiás</strong><span class="valor">Benefício aprovado: R$ 51.000</span></div></div>
+        <div class="depo"><div class="depo-text">Processo tranquilo e muito bem explicado. Conseguimos o enquadramento e realizamos o sonho da casa própria para toda a família.<br/><br/><strong>Marcos e Juliana T. — Valparaíso de Goiás</strong><span class="valor">Benefício aprovado: R$ 77.800</span></div></div>
+        <div class="depo"><div class="depo-text">O atendimento foi personalizado do começo ao fim. Me senti segura em cada etapa e o resultado superou todas as minhas expectativas.<br/><br/><strong>Patrícia M. — Águas Lindas de Goiás</strong><span class="valor">Benefício aprovado: R$ 63.400</span></div></div>
+        <div class="depo"><div class="depo-text">Não acreditava que teria direito a tanto. Com a orientação da MinhaCasa GO, minha família finalmente tem o lar que sempre quis.<br/><br/><strong>Roberto e Ana S. — Luziânia</strong><span class="valor">Benefício aprovado: R$ 89.000</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-final">
+    <div class="container">
+      <div class="cta-box">
+        <p class="section-label">Próximo passo</p>
+        <h2>Veja qual benefício está disponível para você</h2>
+        <div class="cta-sub">Desejo receber atendimento via WhatsApp</div>
+        <a href="https://wa.me/5561992655756?text=Ol%C3%A1%21+Quero+receber+atendimento+sobre+o+benef%C3%ADcio+habitacional." class="btn-wpp" target="_blank">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Falar pelo WhatsApp
+        </a>
+        <div class="cta-links">
+          <a class="cta-link" href="#page2">Simulação Gratuita</a>
+          <span class="cta-divider">|</span>
+          <a class="cta-link" href="https://wa.me/5561992655756?text=Ol%C3%A1%21+Quero+ser+MQL+Indicador+da+MinhaCasa+GO." target="_blank">Trabalhe Conosco</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <strong>MinhaCasa GO</strong> — Benefícios Habitacionais em Goiás<br/>
+    <a href="https://www.minhacasago.com.br">www.minhacasago.com.br</a> · Goiás, Brasil<br/><br/>
+    Os valores de benefício variam conforme perfil, regras dos programas e disponibilidade de recursos. Consulte sempre as condições atualizadas.
+  </footer>
+
+</div><!-- /page1 -->
+
+
+<!-- ╔══════════════════════════════════════════════╗ -->
+<!-- ║   PAGE 2 — shown when URL hash = #page2      ║ -->
+<!-- ╚══════════════════════════════════════════════╝ -->
+<div id="page2" class="form-page">
+
+  <div class="top-strip-wrap">
+    <div class="top-strip">
+      <span>Benefícios habitacionais para Goiás</span>
+      <span>Até R$ 47.800 de Subsídio Estadual + Minha Casa Minha Vida</span>
+      <span>Simule Agora</span>
+      <span>Atendimento Personalizado</span>
+      <span>Benefícios habitacionais para Goiás</span>
+      <span>Até R$ 47.800 de Subsídio Estadual + Minha Casa Minha Vida</span>
+      <span>Simule Agora</span>
+      <span>Atendimento Personalizado</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-inner">
+      <a class="logo-wrap" href="#page1">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="logo-name"><em>MinhaCasa</em><span class="go-badge">GO</span></div>
+          <div class="logo-sub">www.minhacasago.com.br</div>
+        </div>
+      </a>
+      <a class="back-link" href="#page1" style="margin-bottom:0;">← Voltar</a>
+    </div>
+  </header>
+
+  <div class="form-hero">
+    <h2>Análise de Crédito — MinhaCasa GO</h2>
+    <p>Preencha seus dados e envie os documentos abaixo para que nossa equipe realize seu enquadramento e informe o valor do seu Subsídio.</p>
+  </div>
+
+  <div class="form-wrap">
+    <a class="back-link" href="#page1">← Voltar à página inicial</a>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-box" id="successBox">
+      <div class="success-ico">🎉</div>
+      <h3>Dados enviados com sucesso!</h3>
+      <p>Nossa equipe recebeu suas informações e entrará em contato em breve com o resultado da sua análise e o valor do seu Subsídio.</p>
+      <a href="https://wa.me/5561992655756?text=Ol%C3%A1%21+Acabei+de+enviar+minha+documenta%C3%A7%C3%A3o+pelo+site+para+an%C3%A1lise+de+cr%C3%A9dito." class="btn-wpp" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Confirmar pelo WhatsApp
+      </a>
+    </div>
+
+    <!-- MAIN FORM -->
+    <div id="mainForm">
+
+      <div class="form-section">
+        <div class="form-section-title">Tipo de Renda</div>
+        <div class="form-section-sub">Selecione seu tipo de renda para exibir os documentos necessários.</div>
+        <div class="renda-toggle">
+          <label class="renda-label label-formal" for="radioFormal">💼 Renda Formal</label>
+          <label class="renda-label label-informal" for="radioInformal">🛠️ Renda Informal</label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Dados Pessoais</div>
+        <div class="form-grid">
+          <div class="field full"><label>Nome completo *</label><input type="text" placeholder="Seu nome completo" /></div>
+          <div class="field"><label>CPF *</label><input type="text" placeholder="000.000.000-00" /></div>
+          <div class="field"><label>Data de nascimento *</label><input type="date" /></div>
+          <div class="field">
+            <label>Estado civil *</label>
+            <select>
+              <option value="">Selecione...</option>
+              <option>Solteiro(a)</option>
+              <option>Casado(a)</option>
+              <option>União estável</option>
+              <option>Divorciado(a)</option>
+              <option>Viúvo(a)</option>
+            </select>
+          </div>
+          <div class="field"><label>Telefone pessoal *</label><input type="tel" placeholder="DDD + número" /></div>
+          <div class="field"><label>Telefone para referência *</label><input type="tel" placeholder="DDD + número" /></div>
+          <div class="field full"><label>E-mail *</label><input type="email" placeholder="seu@email.com.br" /></div>
+        </div>
+      </div>
+
+      <hr class="form-divider" />
+
+      <!-- Hidden radios — siblings of secFormal / secInformal, controlled by labels in toggle above -->
+      <input type="radio" name="renda" id="radioFormal" checked style="display:none" />
+      <input type="radio" name="renda" id="radioInformal" style="display:none" />
+
+      <!-- RENDA FORMAL -->
+      <div id="secFormal">
+        <div class="form-section">
+          <div class="form-section-title">Documentação — Renda Formal</div>
+          <div class="form-section-sub">Apresentar cópias legíveis de todos os documentos abaixo — inclusive do cônjuge, caso seja casado(a).</div>
+          <div class="doc-list">
+            <div class="doc-item" id="doc-f1">
+              <div class="doc-icon">🪪</div>
+              <div class="doc-info"><div class="doc-name">RG/CPF ou CNH</div><div class="doc-hint">Cópia legível, frente e verso</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-f1',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-f2">
+              <div class="doc-icon">📄</div>
+              <div class="doc-info"><div class="doc-name">Comprovante de Estado Civil</div><div class="doc-hint">Certidão de nascimento ou casamento</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-f2',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-f3">
+              <div class="doc-icon">💼</div>
+              <div class="doc-info"><div class="doc-name">Carteira de Trabalho</div><div class="doc-hint">Páginas: foto, qualificação e registros (pode ser digital)</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-f3',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-f4">
+              <div class="doc-icon">💵</div>
+              <div class="doc-info"><div class="doc-name">2 Últimos Contracheques</div><div class="doc-hint">Os dois holerites mais recentes</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="markUploaded('doc-f4',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-f5">
+              <div class="doc-icon">📋</div>
+              <div class="doc-info"><div class="doc-name">Decl. de Imposto de Renda + Recibo <span class="optional-tag">Opcional</span></div><div class="doc-hint">Caso declare IR</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-f5',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-f6">
+              <div class="doc-icon">🏠</div>
+              <div class="doc-info"><div class="doc-name">Comprovante de Residência Atual</div><div class="doc-hint">Conta de água, luz ou telefone recente</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-f6',this)" /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RENDA INFORMAL -->
+      <div id="secInformal">
+        <div class="form-section">
+          <div class="form-section-title">Documentação — Renda Informal</div>
+          <div class="form-section-sub">Apresentar cópias legíveis de todos os documentos abaixo.</div>
+          <div class="doc-list">
+            <div class="doc-item" id="doc-i1">
+              <div class="doc-icon">🪪</div>
+              <div class="doc-info"><div class="doc-name">Identidade / CPF</div><div class="doc-hint">Cópia legível, frente e verso</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-i1',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-i2">
+              <div class="doc-icon">📄</div>
+              <div class="doc-info"><div class="doc-name">Comprovante de Estado Civil</div><div class="doc-hint">Certidão de nascimento ou casamento</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-i2',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-i3">
+              <div class="doc-icon">🏠</div>
+              <div class="doc-info"><div class="doc-name">Comprovante de Residência Atual</div><div class="doc-hint">Conta de água, luz ou telefone recente</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="markUploaded('doc-i3',this)" /></div>
+            </div>
+            <div class="doc-item" id="doc-i4">
+              <div class="doc-icon">🏦</div>
+              <div class="doc-info"><div class="doc-name">Extratos Bancários dos últimos 90 dias</div><div class="doc-hint">Todos os extratos do período</div></div>
+              <div class="btn-upload-wrap"><button class="btn-upload" type="button">📎 Anexar</button><input type="file" accept=".pdf,.jpg,.jpeg,.png" multiple onchange="markUploaded('doc-i4',this)" /></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-area">
+        <button class="btn-submit" type="button" onclick="submitForm()">✅ Enviar Documentação</button>
+        <div class="submit-note">Simulação gratuita · Sem compromisso · Atendimento Personalizado</div>
+      </div>
+
+    </div><!-- /mainForm -->
+  </div><!-- /form-wrap -->
+
+  <footer>
+    <strong>MinhaCasa GO</strong> — Benefícios Habitacionais em Goiás<br/>
+    <a href="https://www.minhacasago.com.br">www.minhacasago.com.br</a> · Goiás, Brasil
+  </footer>
+
+</div><!-- /page2 -->
+
+<script>
+  function markUploaded(docId, input) {
+    if (!input.files || input.files.length === 0) return;
+    var item = document.getElementById(docId);
+    item.classList.add('uploaded');
+    item.querySelector('.doc-icon').textContent = '✅';
+    var btn = item.querySelector('.btn-upload');
+    var filename = input.files.length > 1 ? input.files.length + ' arquivos' : input.files[0].name;
+    btn.textContent = '✔ ' + (filename.length > 14 ? filename.substring(0,12) + '…' : filename);
+    btn.style.borderColor = '#2e9e59';
+    btn.style.color = '#2e9e59';
+  }
+
+  function submitForm() {
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>
