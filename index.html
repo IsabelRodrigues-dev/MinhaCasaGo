@@ -870,7 +870,7 @@
       </div>
 
       <div class="submit-area">
-        <button class="btn-submit" type="button" onclick="submitForm()">✅ Enviar Documentação</button>
+        <button class="btn-submit" type="button" onclick="window.submitForm()">✅ Enviar Documentação</button>
         <div class="submit-note">Simulação gratuita · Sem compromisso · Atendimento Personalizado</div>
       </div>
 
@@ -884,25 +884,146 @@
 
 </div><!-- /page2 -->
 
-<script>
-  function markUploaded(docId, input) {
-    if (!input.files || input.files.length === 0) return;
-    var item = document.getElementById(docId);
-    item.classList.add('uploaded');
-    item.querySelector('.doc-icon').textContent = '✅';
-    var btn = item.querySelector('.btn-upload');
-    var filename = input.files.length > 1 ? input.files.length + ' arquivos' : input.files[0].name;
-    btn.textContent = '✔ ' + (filename.length > 14 ? filename.substring(0,12) + '…' : filename);
-    btn.style.borderColor = '#2e9e59';
-    btn.style.color = '#2e9e59';
-  }
-
-  function submitForm() {
-    document.getElementById('mainForm').style.display = 'none';
-    document.getElementById('successBox').style.display = 'block';
-    window.scrollTo(0, 0);
+html
+<script type="importmap">
+  {
+    "imports": {
+      "firebase/app": "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js",
+      "firebase/auth": "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js",
+      "firebase/firestore": "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js",
+      "firebase/storage": "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js"
+    }
   }
 </script>
 
+<script type="module">
+  // Configuração do Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDH07-lGV5S4v_atFtcv-lfL_Zv3H5y4kM",
+    authDomain: "minhacasago-de6c6.firebaseapp.com",
+    projectId: "minhacasago-de6c6",
+    storageBucket: "minhacasago-de6c6.firebasestorage.app",
+    messagingSenderId: "568246736030",
+    appId: "1:568246736030:web:96d95fd1648ef072c7978f"
+  };
+
+  import { initializeApp } from "firebase/app";
+  import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+  import { getFirestore, doc, setDoc } from "firebase/firestore";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Função para marcar arquivos como enviados
+  window.markUploaded = function(docId, input) {
+    if (!input.files || input.files.length === 0) return;
+    var item = document.getElementById(docId);
+    if (item) {
+      item.classList.add('uploaded');
+      var iconDiv = item.querySelector('.doc-icon');
+      if (iconDiv) iconDiv.textContent = '✅';
+      var btn = item.querySelector('.btn-upload');
+      if (btn) {
+        var filename = input.files.length > 1 ? input.files.length + ' arquivos' : input.files[0].name;
+        btn.textContent = '✔ ' + (filename.length > 14 ? filename.substring(0,12) + '…' : filename);
+        btn.style.borderColor = '#2e9e59';
+        btn.style.color = '#2e9e59';
+      }
+    }
+  };
+
+  // Função principal de envio do formulário
+  window.submitForm = async function() {
+    const btn = document.querySelector('.btn-submit');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '⏳ Enviando...';
+    btn.disabled = true;
+
+    try {
+      // Coletar dados do formulário
+      const nome = document.querySelector('#mainForm input[placeholder="Seu nome completo"]')?.value || '';
+      const cpf = document.querySelector('#mainForm input[placeholder="000.000.000-00"]')?.value || '';
+      const dataNasc = document.querySelector('#mainForm input[type="date"]')?.value || '';
+      const estadoCivil = document.querySelector('#mainForm select')?.value || '';
+      const telefone = document.querySelector('#mainForm input[type="tel"]')?.value || '';
+      const telefoneRef = document.querySelectorAll('#mainForm input[type="tel"]')[1]?.value || '';
+      const email = document.querySelector('#mainForm input[type="email"]')?.value || '';
+      
+      const isFormal = document.getElementById('radioFormal')?.checked || false;
+      const tipoRenda = isFormal ? 'formal' : 'informal';
+      
+      if (!email) {
+        throw new Error('Por favor, preencha o e-mail');
+      }
+      
+      if (!nome || !cpf || !telefone) {
+        throw new Error('Por favor, preencha todos os campos obrigatórios');
+      }
+      
+      // Criar conta no Firebase Authentication
+      const senhaTemporaria = Math.random().toString(36).slice(-8) + 'A1!';
+      const userCredential = await createUserWithEmailAndPassword(auth, email, senhaTemporaria);
+      const userId = userCredential.user.uid;
+      
+      // Enviar senha por WhatsApp
+      const msgWhats = encodeURIComponent(`Olá! Seu cadastro foi iniciado no site MinhaCasa GO. Sua senha temporária é: ${senhaTemporaria}. Acesse com seu email: ${email}. Recomendamos trocar a senha após o primeiro acesso.`);
+      window.open(`https://wa.me/5561992655756?text=${msgWhats}`, '_blank');
+      
+      // Upload dos documentos
+      const documents = [];
+      const docItems = isFormal 
+        ? ['doc-f1', 'doc-f2', 'doc-f3', 'doc-f4', 'doc-f5', 'doc-f6']
+        : ['doc-i1', 'doc-i2', 'doc-i3', 'doc-i4'];
+      
+      for (const docId of docItems) {
+        const item = document.getElementById(docId);
+        const fileInput = item?.querySelector('input[type="file"]');
+        if (fileInput?.files?.length > 0) {
+          const files = Array.from(fileInput.files);
+          for (const file of files) {
+            const fileRef = ref(storage, `usuarios/${userId}/documentos/${docId}/${Date.now()}_${file.name}`);
+            await uploadBytes(fileRef, file);
+            const url = await getDownloadURL(fileRef);
+            documents.push({ tipo: docId, nome: file.name, url: url });
+          }
+        }
+      }
+      
+      // Salvar no Firestore
+      await setDoc(doc(db, 'solicitacoes', userId + '_' + Date.now()), {
+        userId: userId,
+        nome: nome,
+        cpf: cpf,
+        dataNascimento: dataNasc,
+        estadoCivil: estadoCivil,
+        telefone: telefone,
+        telefoneReferencia: telefoneRef,
+        email: email,
+        tipoRenda: tipoRenda,
+        documentos: documents,
+        status: 'pendente',
+        dataEnvio: new Date().toISOString(),
+        timestamp: Date.now()
+      });
+      
+      // Mostrar sucesso
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('successBox').style.display = 'block';
+      window.scrollTo(0, 0);
+      
+    } catch (error) {
+      console.error('Erro no envio:', error);
+      alert('Erro ao enviar: ' + error.message + '. Tente novamente.');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
+  };
+</script>
 </body>
 </html>
+"Versão completa com Firebase integrado"
