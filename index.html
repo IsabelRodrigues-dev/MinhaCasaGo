@@ -963,16 +963,7 @@ html
       if (!nome || !cpf || !telefone) {
         throw new Error('Por favor, preencha todos os campos obrigatórios');
       }
-      
-      // Criar conta no Firebase Authentication
-      const senhaTemporaria = Math.random().toString(36).slice(-8) + 'A1!';
-      const userCredential = await createUserWithEmailAndPassword(auth, email, senhaTemporaria);
-      const userId = userCredential.user.uid;
-      
-      // Enviar senha por WhatsApp
-      const msgWhats = encodeURIComponent(`Olá! Seu cadastro foi iniciado no site MinhaCasa GO. Sua senha temporária é: ${senhaTemporaria}. Acesse com seu email: ${email}. Recomendamos trocar a senha após o primeiro acesso.`);
-      window.open(`https://wa.me/5561992655756?text=${msgWhats}`, '_blank');
-      
+        
       // Upload dos documentos
       const documents = [];
       const docItems = isFormal 
