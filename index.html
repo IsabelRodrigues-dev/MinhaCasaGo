@@ -907,14 +907,13 @@ html
     appId: "1:568246736030:web:96d95fd1648ef072c7978f"
   };
 
+  // IMPORTANTE: NÃO importamos mais o Auth
   import { initializeApp } from "firebase/app";
-  import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
   import { getFirestore, doc, setDoc } from "firebase/firestore";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-  // Inicializar Firebase
+  // Inicializar Firebase (sem Authentication)
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
   const db = getFirestore(app);
   const storage = getStorage(app);
 
@@ -936,7 +935,7 @@ html
     }
   };
 
-  // Função principal de envio do formulário
+  // Função principal de envio do formulário (SEM criar usuário)
   window.submitForm = async function() {
     const btn = document.querySelector('.btn-submit');
     const originalText = btn.innerHTML;
@@ -956,15 +955,14 @@ html
       const isFormal = document.getElementById('radioFormal')?.checked || false;
       const tipoRenda = isFormal ? 'formal' : 'informal';
       
-      if (!email) {
-        throw new Error('Por favor, preencha o e-mail');
-      }
-      
       if (!nome || !cpf || !telefone) {
         throw new Error('Por favor, preencha todos os campos obrigatórios');
       }
-        
-      // Upload dos documentos
+      
+      // Gerar um ID único para esta solicitação
+      const solicitationId = Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+      
+      // Upload dos documentos para o Storage
       const documents = [];
       const docItems = isFormal 
         ? ['doc-f1', 'doc-f2', 'doc-f3', 'doc-f4', 'doc-f5', 'doc-f6']
@@ -976,17 +974,17 @@ html
         if (fileInput?.files?.length > 0) {
           const files = Array.from(fileInput.files);
           for (const file of files) {
-            const fileRef = ref(storage, `usuarios/${userId}/documentos/${docId}/${Date.now()}_${file.name}`);
+            const fileRef = ref(storage, `solicitacoes/${solicitationId}/documentos/${docId}/${Date.now()}_${file.name}`);
             await uploadBytes(fileRef, file);
             const url = await getDownloadURL(fileRef);
-            documents.push({ tipo: docId, nome: file.name, url: url });
+            documents.push({ tipo: docId, nome: file.name, url: url, dataEnvio: new Date().toISOString() });
           }
         }
       }
       
-      // Salvar no Firestore
-      await setDoc(doc(db, 'solicitacoes', userId + '_' + Date.now()), {
-        userId: userId,
+      // Salvar no Firestore (sem usuário)
+      await setDoc(doc(db, 'solicitacoes', solicitationId), {
+        id: solicitationId,
         nome: nome,
         cpf: cpf,
         dataNascimento: dataNasc,
@@ -1008,7 +1006,13 @@ html
       
     } catch (error) {
       console.error('Erro no envio:', error);
-      alert('Erro ao enviar: ' + error.message + '. Tente novamente.');
+      let mensagemErro = error.message;
+      if (mensagemErro.includes('storage')) {
+        mensagemErro = 'Erro no Storage. Verifique se o Firebase Storage está ativado no console do Firebase.';
+      } else if (mensagemErro.includes('permission')) {
+        mensagemErro = 'Erro de permissão. Configure as regras do Firestore e Storage como "allow read, write: if true" para teste.';
+      }
+      alert('Erro ao enviar: ' + mensagemErro);
     } finally {
       btn.innerHTML = originalText;
       btn.disabled = false;
